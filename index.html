@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aleisha's Super Quiz Adventure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🌈 Aleisha's Super Quiz Adventure 🌟</h1>
+        <p>Hey, Aleisha Aditya Ashok! Pick a subject and answer 15 fun questions! 🎉</p>
+        <img src="quiz-hero.png" alt="Fun quiz character" class="hero-image">
+        <select id="subjectSelect" aria-label="Choose a quiz subject" onchange="loadQuestions()">
+            <option value="Math">Math 🧮</option>
+            <option value="English">English 📚</option>
+            <option value="GeneralKnowledge">General Knowledge 🌍</option>
+        </select>
+        <form id="quizForm">
+            <div id="progress"></div>
+            <div id="questions"></div>
+            <div id="errorMessage" class="error" style="display: none;"></div>
+            <button type="submit" id="submit-btn" aria-label="Submit your quiz answers">Submit Answers! 🚀</button>
+        </form>
+        <div id="feedbackModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+            <p id="feedbackText"></p>
+            <button onclick="document.getElementById('feedbackModal').style.display='none'">Close</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+    <script>
+        (function(){
+            emailjs.init("k-fel7IOR12ppDslo");
+        })();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
