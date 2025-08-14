@@ -7,11 +7,15 @@ let allQuestions = [];
 let selectedQuestions = [];
 
 // Load questions when page loads
+window.onload = function () {
+    loadQuestions();
+};
+
 function loadQuestions() {
     const subject = document.getElementById("subjectSelect").value;
     document.getElementById("errorMessage").style.display = "none"; // Hide error message initially
 
-    console.log("Selected subject:", subject); // Debug: Check subject value
+    console.log("Selected subject:", subject); // Debug
 
     fetch("questions.json")
         .then(response => {
@@ -21,12 +25,12 @@ function loadQuestions() {
             return response.json();
         })
         .then(data => {
-            console.log("Fetched data:", data); // Debug: Check fetched JSON
+            console.log("Fetched data:", data); // Debug
             allQuestions = data;
             let filtered = subject === "all"
                 ? allQuestions
-                : allQuestions.filter(q => q.subject === subject);
-            console.log("Filtered questions:", filtered); // Debug: Check filtered questions
+                : allQuestions.filter(q => q.subject.toLowerCase() === subject.toLowerCase());
+            console.log("Filtered questions:", filtered); // Debug
 
             if (filtered.length === 0) {
                 document.getElementById("errorMessage").innerText = `⚠️ No questions found for ${subject}. Please check questions.json or try another subject.`;
@@ -52,12 +56,18 @@ function loadQuestions() {
 
 function displayQuestions() {
     const container = document.getElementById("questions");
+    const progress = document.getElementById("progress");
     container.innerHTML = "";
+
+    if (selectedQuestions.length === 0) {
+        container.innerHTML = "<p>No questions available for this subject. Please try another!</p>";
+        return;
+    }
+
+    progress.innerHTML = `<p>Questions: ${selectedQuestions.length}/15</p>`;
 
     selectedQuestions.forEach((q, index) => {
         let inputHTML = "";
-
-        // If options exist → multiple choice
         if (q.options && Array.isArray(q.options) && q.options.length > 0) {
             inputHTML = q.options.map(option => `
                 <label>
@@ -66,12 +76,10 @@ function displayQuestions() {
                 </label>
             `).join("<br>");
         } else {
-            // If no options → text input
             inputHTML = `
                 <input type="text" name="question${index}" placeholder="Type your answer here" required>
             `;
         }
-
         container.innerHTML += `
             <div class="question-block">
                 <p><strong>Q${index + 1}:</strong> ${q.question}</p>
@@ -81,13 +89,11 @@ function displayQuestions() {
     });
 }
 
-// Handle form submission
 document.getElementById("quizForm").addEventListener("submit", function (event) {
     event.preventDefault();
     let score = 0;
     let results = "";
     let feedbackHTML = "<h3>🎉 Your Quiz Results, Aleisha! 🎉</h3>";
-    feedbackHTML += `<p>You scored ${score}/${selectedQuestions.length}!</p>`;
     let allAnswered = true;
 
     selectedQuestions.forEach((q, index) => {
@@ -102,7 +108,7 @@ document.getElementById("quizForm").addEventListener("submit", function (event) 
         if (isCorrect) {
             score++;
         }
-        results += `Q${index + 1}: ${q.question}\nYour answer: ${userAnswer}\nCorrect answer: ${q.answer}\n\n`;
+        results += `Q${index + 1}: ${q.question}\nYour answer: ${userAnswer}\nCorrect answer: ${q.answer}\n${isCorrect ? "Correct ✅" : "Wrong ❌"}\n\n`;
         feedbackHTML += `
             <div style="margin: 10px 0;">
                 <p><strong>Q${index + 1}:</strong> ${q.question}</p>
@@ -121,9 +127,13 @@ document.getElementById("quizForm").addEventListener("submit", function (event) 
     }
 
     const formData = {
-        from_name: "Aleisha",
+        name: "Aleisha",
+        user_name: "Aleisha",
         score: `${score} / ${selectedQuestions.length}`,
-        quiz_results: results
+        answers: results,
+        subject: document.getElementById("subjectSelect").value,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString()
     };
 
     emailjs.send("service_mvgtdzj", "template_e6smd0o", formData)
@@ -131,7 +141,11 @@ document.getElementById("quizForm").addEventListener("submit", function (event) 
             document.getElementById("feedbackText").innerHTML = feedbackHTML;
             document.getElementById("feedbackModal").style.display = "block";
             const confetti = new JSConfetti();
-            confetti.addConfetti();
+            if (score >= 10) {
+                confetti.addConfetti({ confettiNumber: 200 });
+            } else {
+                confetti.addConfetti();
+            }
         })
         .catch((error) => {
             console.error("EmailJS error:", error);
