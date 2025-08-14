@@ -84,21 +84,41 @@ function displayQuestions() {
 // Handle form submission
 document.getElementById("quizForm").addEventListener("submit", function (event) {
     event.preventDefault();
-
     let score = 0;
     let results = "";
+    let feedbackHTML = "<h3>🎉 Your Quiz Results, Aleisha! 🎉</h3>";
+    feedbackHTML += `<p>You scored ${score}/${selectedQuestions.length}!</p>`;
+    let allAnswered = true;
 
     selectedQuestions.forEach((q, index) => {
         const inputEl = document.querySelector(`input[name="question${index}"]:checked`) ||
                         document.querySelector(`input[name="question${index}"]`);
-        const userAnswer = inputEl ? inputEl.value.trim() : "No answer";
-
-        if (userAnswer.toLowerCase() === q.answer.toLowerCase()) {
+        const userAnswer = inputEl ? inputEl.value.trim() : "";
+        if (!userAnswer) {
+            allAnswered = false;
+            return;
+        }
+        const isCorrect = userAnswer.toLowerCase() === q.answer.toLowerCase();
+        if (isCorrect) {
             score++;
         }
-
         results += `Q${index + 1}: ${q.question}\nYour answer: ${userAnswer}\nCorrect answer: ${q.answer}\n\n`;
+        feedbackHTML += `
+            <div style="margin: 10px 0;">
+                <p><strong>Q${index + 1}:</strong> ${q.question}</p>
+                <p>Your answer: ${userAnswer} ${isCorrect ? "✅ Correct!" : "❌ Wrong"}</p>
+                ${!isCorrect ? `<p>Correct answer: ${q.answer}</p>` : ""}
+            </div>
+        `;
     });
+
+    feedbackHTML = `<h3>🎉 Your Quiz Results, Aleisha! 🎉</h3><p>You scored ${score}/${selectedQuestions.length}!</p>` + feedbackHTML;
+
+    if (!allAnswered) {
+        document.getElementById("errorMessage").innerText = "Please answer all questions!";
+        document.getElementById("errorMessage").style.display = "block";
+        return;
+    }
 
     const formData = {
         from_name: "Aleisha",
@@ -108,9 +128,14 @@ document.getElementById("quizForm").addEventListener("submit", function (event) 
 
     emailjs.send("service_mvgtdzj", "template_e6smd0o", formData)
         .then(() => {
-            alert(`Quiz submitted! You scored ${score}/${selectedQuestions.length}`);
+            document.getElementById("feedbackText").innerHTML = feedbackHTML;
+            document.getElementById("feedbackModal").style.display = "block";
+            const confetti = new JSConfetti();
+            confetti.addConfetti();
         })
         .catch((error) => {
             console.error("EmailJS error:", error);
+            document.getElementById("errorMessage").innerText = `Failed to send email: ${error.text}`;
+            document.getElementById("errorMessage").style.display = "block";
         });
 });
