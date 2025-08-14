@@ -1,0 +1,101 @@
+// Initialize EmailJS
+(function () {
+    emailjs.init("k-fel7IOR12ppDslo"); // Your public key
+})();
+
+let allQuestions = [];
+let selectedQuestions = [];
+
+// Load questions when page loads
+window.onload = function () {
+    loadQuestions();
+};
+
+function loadQuestions() {
+    const subject = document.getElementById("subjectSelect").value;
+
+    fetch("questions.json")
+        .then(response => response.json())
+        .then(data => {
+            allQuestions = data;
+
+            let filtered = subject === "all"
+                ? allQuestions
+                : allQuestions.filter(q => q.subject === subject);
+
+            selectedQuestions = [];
+            while (selectedQuestions.length < 15 && filtered.length > 0) {
+                const randomIndex = Math.floor(Math.random() * filtered.length);
+                selectedQuestions.push(filtered[randomIndex]);
+                filtered.splice(randomIndex, 1);
+            }
+
+            displayQuestions();
+        })
+        .catch(err => console.error("Error loading questions:", err));
+}
+
+function displayQuestions() {
+    const container = document.getElementById("questions");
+    container.innerHTML = "";
+
+    selectedQuestions.forEach((q, index) => {
+        let inputHTML = "";
+
+        // If options exist → multiple choice
+        if (q.options && Array.isArray(q.options) && q.options.length > 0) {
+            inputHTML = q.options.map(option => `
+                <label>
+                    <input type="radio" name="question${index}" value="${option}" required>
+                    ${option}
+                </label>
+            `).join("<br>");
+        } else {
+            // If no options → text input
+            inputHTML = `
+                <input type="text" name="question${index}" placeholder="Type your answer here" required>
+            `;
+        }
+
+        container.innerHTML += `
+            <div class="question-block">
+                <p><strong>Q${index + 1}:</strong> ${q.question}</p>
+                ${inputHTML}
+            </div>
+        `;
+    });
+}
+
+// Handle form submission
+document.getElementById("quizForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    let score = 0;
+    let results = "";
+
+    selectedQuestions.forEach((q, index) => {
+        const inputEl = document.querySelector(`input[name="question${index}"]:checked`) ||
+                        document.querySelector(`input[name="question${index}"]`);
+        const userAnswer = inputEl ? inputEl.value.trim() : "No answer";
+
+        if (userAnswer.toLowerCase() === q.answer.toLowerCase()) {
+            score++;
+        }
+
+        results += `Q${index + 1}: ${q.question}\nYour answer: ${userAnswer}\nCorrect answer: ${q.answer}\n\n`;
+    });
+
+    const formData = {
+        from_name: "Aleisha",
+        score: `${score} / ${selectedQuestions.length}`,
+        quiz_results: results
+    };
+
+    emailjs.send("service_mvgtdzj", "template_e6smd0o", formData)
+        .then(() => {
+            alert(`Quiz submitted! You scored ${score}/${selectedQuestions.length}`);
+        })
+        .catch((error) => {
+            console.error("EmailJS error:", error);
+        });
+});
