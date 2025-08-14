@@ -56,4 +56,87 @@ select#subjectSelect {
 
 select#subjectSelect:focus {
     outline: 2px solid #ff4081;
-    outline-offset: 2
+    outline-offset: 2px;
+}
+
+.question-block {
+    margin-bottom: 20px;
+    text-align: left;
+    background-color: #f3e5f5;
+    padding: 15px;
+    border-radius: 10px;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ffeb3b;
+    border-radius: 5px;
+    width: calc(100% - 24px);
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+button#submit-btn {
+    padding: 15px 30px;
+    background: linear-gradient(45deg, #ff4081, #ffeb3b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Comic Sans MS', 'Arial', sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: pulse 1.5s infinite;
+}
+
+button#submit-btn:hover {
+    background: linear-gradient(45deg, #d81b60, #fbc02d);
+    transform: scale(1.1) rotate(3deg);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+button#submit-btn:focus {
+    outline: 3px solid #ff4081;
+    outline-offset: 3px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.error {
+    color: #ff4444;
+    font-size: 16px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+#progress {
+    font-size: 18px;
+    color: #ff4081;
+    font-weight: bold;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+#feedbackModal {
+    font-size: 18px;
+    text-align: center;
+    background-color: #ffffff;
+    border: 3px solid #ffeb3b;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0
