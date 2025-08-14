@@ -7,21 +7,32 @@ let allQuestions = [];
 let selectedQuestions = [];
 
 // Load questions when page loads
-window.onload = function () {
-    loadQuestions();
-};
-
 function loadQuestions() {
     const subject = document.getElementById("subjectSelect").value;
+    document.getElementById("errorMessage").style.display = "none"; // Hide error message initially
+
+    console.log("Selected subject:", subject); // Debug: Check subject value
 
     fetch("questions.json")
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("Fetched data:", data); // Debug: Check fetched JSON
             allQuestions = data;
-
             let filtered = subject === "all"
                 ? allQuestions
                 : allQuestions.filter(q => q.subject === subject);
+            console.log("Filtered questions:", filtered); // Debug: Check filtered questions
+
+            if (filtered.length === 0) {
+                document.getElementById("errorMessage").innerText = `⚠️ No questions found for ${subject}. Please check questions.json or try another subject.`;
+                document.getElementById("errorMessage").style.display = "block";
+                return;
+            }
 
             selectedQuestions = [];
             while (selectedQuestions.length < 15 && filtered.length > 0) {
@@ -32,7 +43,11 @@ function loadQuestions() {
 
             displayQuestions();
         })
-        .catch(err => console.error("Error loading questions:", err));
+        .catch(err => {
+            console.error("Error loading questions:", err);
+            document.getElementById("errorMessage").innerText = `⚠️ Oops! Could not load questions. Error: ${err.message}`;
+            document.getElementById("errorMessage").style.display = "block";
+        });
 }
 
 function displayQuestions() {
