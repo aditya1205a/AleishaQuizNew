@@ -138,14 +138,12 @@ button#submit-btn:focus {
 }
 
 #feedbackModal {
-    font-size: 18px;
     background-color: #ffffff;
     border: 3px solid #ffeb3b;
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    max-width: 90vw;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-width: 90vw; /* Responsive width */
+    max-height: 80vh; /* Limit height */
     padding: 20px;
     font-family: 'Comic Sans MS', 'Arial', sans-serif;
     position: fixed;
@@ -153,14 +151,32 @@ button#submit-btn:focus {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
+    display: flex; /* Flexbox for layout */
+    flex-direction: column; /* Stack content */
+    overflow: hidden; /* Prevent modal itself from scrolling */
 }
 
 #feedbackText {
     color: #333;
     font-size: 16px;
-    max-height: 60vh;
-    overflow-y: auto;
+    max-height: 50vh; /* Fit content with close button */
+    overflow-y: auto; /* Scrollable content */
     padding: 10px;
+    flex-grow: 1; /* Expand to available space */
+    scrollbar-width: thin; /* Firefox: slim scrollbar */
+    scrollbar-color: #ff4081 #f3e5f5; /* Colorful scrollbar */
+}
+
+#feedbackText::-webkit-scrollbar {
+    width: 8px; /* Chrome, Edge, Safari */
+}
+#feedbackText::-webkit-scrollbar-track {
+    background: #f3e5f5;
+    border-radius: 10px;
+}
+#feedbackText::-webkit-scrollbar-thumb {
+    background: #ff4081;
+    border-radius: 10px;
 }
 
 #feedbackText h3 {
@@ -181,7 +197,7 @@ button#submit-btn:focus {
 }
 
 #feedbackModal button {
-    background: linear-gradient(45deg, #ff4081, #ffeb3b);
+    background: linear-gradient(45deg, #ff4081, #ffeb3b); /* Colorful gradient */
     color: white;
     padding: 10px 20px;
     border: none;
